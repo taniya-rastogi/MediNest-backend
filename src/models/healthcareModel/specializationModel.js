@@ -30,12 +30,7 @@ const getAllSpecializations = async () => {
 //   return result.affectedRows > 0;
 // };
 
-module.exports = {
-  getAllSpecializations,
-//   getSpecializationById,
-//   addSpecialization,
-//   deleteSpecialization
-};
+module.exports = { getAllSpecializations };
 
 
 

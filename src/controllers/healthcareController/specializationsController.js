@@ -6,6 +6,10 @@
 // src/controllers/healthcareController/specializationsController.js
 const specializationModel = require('../../models/healthcareModel/specializationModel');
 
+
+// ----------- GET REQUEST -----------
+
+//get all specializations
 const getSpecializations = async (req, res) => {
   try {
     const specializations = await specializationModel.getAllSpecializations();
@@ -25,4 +29,8 @@ const getSpecializations = async (req, res) => {
   }
 };
 
-module.exports = getSpecializations;
+
+
+
+
+module.exports = { getSpecializations };

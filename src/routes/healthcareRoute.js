@@ -5,13 +5,15 @@ const router = express.Router();
 
 // Import controllers
 const specializationsController = require('../controllers/healthcareController/specializationsController');
-// const doctorsController = require('../controllers/healthcareController/doctorsController');
+const doctorsController = require('../controllers/healthcareController/doctorsController');
 
 
 // ----------- SPECIALIZATION ROUTES -----------
 
 // GET /healthcare → list of specializations
-router.get('/', specializationsController);
+router.get('/', specializationsController.getSpecializations); //(path, callback)
+router.get('/:specialization', doctorsController.getDoctorsBySpecialization);
+
 
 
 
