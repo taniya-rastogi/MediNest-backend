@@ -1,32 +1,25 @@
-// src/middleware/upload.js
-
 const multer = require("multer");
-const path = require("path");//Built-in Node.js module to manage file paths, Getting extension & making unique filename
+const path = require("path");
 
-// Storage engine — store temporary file in tempUploads folder
+// Temporary upload folder (will auto-delete after Cloudinary upload)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "tempUploads/"); // ✅ your temp folder name
+    cb(null, "tempUploads/");
   },
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + path.extname(file.originalname);
-    cb(null, uniqueName);
+    cb(null, Date.now() + path.extname(file.originalname));
   }
 });
 
-// Only allow image uploads
+// File Filter (allow only images)
 const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith("image/")) {
+  const allowed = ["image/jpeg", "image/jpg", "image/png"];
+  if (allowed.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Only image files are allowed"), false);
+    cb(new Error("Only JPEG/PNG images allowed"), false);
   }
 };
 
-// Multer object
-const upload = multer({
-  storage,
-  fileFilter
-});
-
+const upload = multer({ storage, fileFilter });
 module.exports = upload;

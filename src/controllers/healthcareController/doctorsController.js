@@ -1,12 +1,9 @@
-// src/controllers/healthcareController/doctorsController.js
-
 const doctorModel = require('../../models/healthcareModel/doctorModel');
-const bucket = require("../../firebase");
+const cloudinary = require("../../config/cloudinary");
 const fs = require("fs");
 
 // -------- GET Routes --------
 
-// GET /healthcare/:specialization
 const getDoctorsBySpecialization = async (req, res) => {
   const specialization = req.params.specialization;
 
@@ -14,20 +11,18 @@ const getDoctorsBySpecialization = async (req, res) => {
     const doctors = await doctorModel.getDoctorsBySpecialization(specialization);
 
     if (doctors.length === 0) {
-      return res.status(404).json({ message: 'No doctors found for this specialization' });
+      return res.status(404).json({ message: 'No doctors found' });
     }
 
     res.status(200).json(doctors);
   } catch (error) {
-    console.error('Error fetching doctors by specialization:', error);
+    console.error(error);
     res.status(500).json({ message: 'Database error' });
   }
 };
 
-// GET /healthcare/:specialization/:doctor_id
 const getADoctorByIdAndSpecialization = async (req, res) => {
-  const specialization = req.params.specialization;
-  const doctor_id = req.params.doctor_id;
+  const { specialization, doctor_id } = req.params;
 
   try {
     const doctor = await doctorModel.getADoctorByIdAndSpecialization(specialization, doctor_id);
@@ -38,13 +33,12 @@ const getADoctorByIdAndSpecialization = async (req, res) => {
 
     res.status(200).json(doctor);
   } catch (error) {
-    console.error('Error fetching doctor:', error);
+    console.error(error);
     res.status(500).json({ message: 'Database error' });
   }
 };
 
-
-// -------- POST: Register Doctor --------
+// -------- REGISTER DOCTOR + CLOUDINARY UPLOAD --------
 
 const registerDoctor = async (req, res) => {
   try {
@@ -63,35 +57,30 @@ const registerDoctor = async (req, res) => {
       consultation_type
     } = req.body;
 
+    // File from multer
     const file = req.file;
-    let dp_url = null;
 
     if (!full_name || !specialization || !email) {
       return res.status(400).json({ message: "Fill all required fields" });
     }
 
-    // ✅ Upload file to Firebase Storage if file exists
-    if (file) {
-      const fileName = `doctors/${Date.now()}_${file.originalname}`;
-      const fileUpload = bucket.file(fileName);
+    let dp_url = null;
+    let dp_public_id = null;
 
-      await new Promise((resolve, reject) => {
-        fs.createReadStream(file.path)
-          .pipe(fileUpload.createWriteStream({
-            metadata: { contentType: file.mimetype },
-          }))
-          .on("finish", resolve)
-          .on("error", reject);
+    // ✅ Upload to Cloudinary if file exists
+    if (file) {
+      const uploadResult = await cloudinary.uploader.upload(file.path, {
+        folder: "medinest/doctors",
       });
 
-      // ✅ File URL
-      dp_url = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+      dp_url = uploadResult.secure_url;
+      dp_public_id = uploadResult.public_id;
 
-      // ✅ Remove temp file
+      // ✅ Remove local temp file
       fs.unlink(file.path, () => {});
     }
 
-    // ✅ Insert doctor into DB
+    // ✅ Save doctor in MySQL
     const result = await doctorModel.registerDoctor({
       full_name,
       specialization,
@@ -103,6 +92,7 @@ const registerDoctor = async (req, res) => {
       phone,
       email,
       dp_url,
+      dp_public_id,
       bio,
       gender,
       consultation_type
@@ -111,7 +101,8 @@ const registerDoctor = async (req, res) => {
     res.status(201).json({
       message: "Doctor registered successfully",
       doctorId: result.insertId,
-      profile_url: dp_url
+      profile_url: dp_url,
+      profile_public_id: dp_public_id
     });
 
   } catch (error) {
