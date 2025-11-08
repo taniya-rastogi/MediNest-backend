@@ -1,35 +1,68 @@
-// // src/controllers/healthcareController/appointmentsController.js
+const {
+  getAvailableSlots,
+  bookAppointment,
+  getDoctorAppointments,
+} = require("../../models/healthcareModel/appointmentsModel");
 
-// const appointmentsModel = require('../../models/healthcareModel/appointmentsModel');
+// Controller: Get doctor available slots
+const getDoctorAvailability = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const { date } = req.query;
 
-// //POST /healthcare/bookAppointment
-// const bookAppointment = async (req, res) => {
-//   const { patient_name, email, phone, gender, age, consultation_type } = req.body;
+    if (!date) return res.status(400).json({ message: "Date is required" });
 
-//   if(!patient_name || (!email && !phone) || !gender || !age || !consultation_type){
-//     return res.status(400).json({ message: "Fill all required fields" });
-//   }
+    const result = await getAvailableSlots(doctorId, date);
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching availability" });
+  }
+};
 
-//   try {
-//     const result = await appointmentsModel.bookAppointment({
-//       patient_name,
-//       email,
-//       phone,
-//       gender,
-//       age,
-//       consultation_type
-//     });
+// Controller: Book appointment
+const createAppointment = async (req, res) => {
+  try {
+    const { doctorId } = req.params;
+    const data = req.body;
 
-//     res.status(201).json({
-//       message: "Appointment booked successfully",
-//       patientId: result.insertId
-//     });
-
-//   } catch (error) {
-//     console.error("Error booking appointment:", error);
-//     res.status(500).json({ message: "Database error" });
-//   }
-// };
+    await bookAppointment(doctorId, data);
+    res.status(201).json({ message: "Appointment booked successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || "Error booking appointment" });
+  }
+};
 
 
-// module.exports = { bookAppointment };
+// Controller to handle fetching doctor's appointments
+const fetchAppointments = async (req, res) => {
+  try {
+    const doctorId = req.params.doctorId; // doctor ID from route param
+    const { date, status, patient_name, sort } = req.query; // optional filters
+
+    const appointments = await getDoctorAppointments(doctorId, {
+      date,
+      status,
+      patient_name,
+      sort,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: appointments,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+module.exports = {
+  getDoctorAvailability,
+  createAppointment,
+  fetchAppointments,
+};
