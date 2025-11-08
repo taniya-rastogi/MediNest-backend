@@ -8,7 +8,23 @@ const getDashboard = async (req, res) => {
     const doctorId = req.doctor.id;
 
     const [rows] = await pool.query(
-      "SELECT id, name, email, specialization FROM doctors WHERE id = ?",
+      `SELECT 
+        id,
+        full_name,
+        email,
+        phone,
+        gender,
+        specialization_id,
+        qualification,
+        experience_years,
+        clinic_hospital_name,
+        location,
+        consultation_type,
+        consultation_fee,
+        bio,
+        dp_url
+      FROM doctors 
+      WHERE id = ?`,
       [doctorId]
     );
 
@@ -19,7 +35,7 @@ const getDashboard = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error dashboard" });
   }
 };
 

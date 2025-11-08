@@ -28,7 +28,7 @@ const doctorLogin = async (req, res) => {
     const token = jwt.sign(
       { id: doctor.id, role: "doctor" },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "12h" }
     );
 
     res.json({
@@ -43,7 +43,7 @@ const doctorLogin = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error doctAuthController" });
   }
 };
 

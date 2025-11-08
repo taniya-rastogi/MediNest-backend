@@ -48,6 +48,7 @@ CREATE TABLE doctors (
   id INT AUTO_INCREMENT PRIMARY KEY,
   full_name VARCHAR(120) NOT NULL,
   email VARCHAR(120) UNIQUE NOT NULL,
+  -- password
   phone VARCHAR(15) UNIQUE NOT NULL,
   gender ENUM('Male','Female','Other'),
   specialization_id INT NOT NULL,
@@ -58,9 +59,10 @@ CREATE TABLE doctors (
   consultation_type ENUM('Online','Clinic','Both') DEFAULT 'Both',
   consultation_fee DECIMAL(10,2),
   dp_url VARCHAR(500),
+  -- dp_public_id
   bio TEXT,
-  rating FLOAT DEFAULT 0,
-  status ENUM('Active','Inactive','Pending') DEFAULT 'Pending',
+  rating FLOAT DEFAULT 0, --on hold
+  status ENUM('Active','Inactive','Pending') DEFAULT 'Pending', --on hold
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -109,3 +111,68 @@ CREATE TABLE doctors (
 --   slot_duration INT NOT NULL,
 --   FOREIGN KEY (doctor_id) REFERENCES doctors(id) ON DELETE CASCADE
 -- );
+
+
+CREATE TABLE holidays (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  holiday_date DATE NOT NULL,
+  reason VARCHAR(255) NOT NULL
+);
+
+
+-- Bulk edit
+
+-- full_name
+-- email
+-- password
+-- phone
+-- gender
+-- specialization
+-- qualification
+-- experience_years
+-- clinic_hospital_name
+-- location
+-- consultation_type
+-- consultation_fee
+-- profile_img
+-- bio
+
+
+
+
+
+-- src/
+--  ┣ config/
+--  ┃ ┣ cloudinary.js
+--  ┃ ┗ db_connection.js
+--  ┣ controllers/
+--  ┃ ┣ educationController/
+--  ┃ ┣ healthcareController/
+--  ┃ ┃ ┣ appointmentsController.js
+--  ┃ ┃ ┣ doctorAuthController.js
+--  ┃ ┃ ┣ doctorDashboardController.js
+--  ┃ ┃ ┣ doctorsController.js
+--  ┃ ┃ ┗ specializationController.js
+--  ┃ ┗ shoppingController/
+--  ┣ middleware/
+--  ┃ ┣ authDoctor.js
+--  ┃ ┗ upload.js
+--  ┣ models/
+--  ┃ ┣ educationModel/
+--  ┃ ┣ healthcareModel/
+--  ┃ ┃ ┣ appointmentsModel.js
+--  ┃ ┃ ┣ doctorModel.js
+--  ┃ ┃ ┗ specializationModel.js
+--  ┃ ┗ shoppingModel/
+--  ┣ routes/
+--  ┃ ┣ healthcareRoutes/
+--  ┃ ┃ ┣ doctorRoutes/
+--  ┃ ┃ ┃ ┣ doctorAuthRoutes.js
+--  ┃ ┃ ┃ ┣ doctorProtectedRoutes.js
+--  ┃ ┃ ┃ ┣ doctorPublicRoutes.js
+--  ┃ ┃ ┃ ┗ index.js
+--  ┃ ┃ ┣ specializationsRoutes.js
+--  ┃ ┃ ┗ healthcareRoute.js
+--  ┣ server.js
+
+

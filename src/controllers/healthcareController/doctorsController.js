@@ -29,7 +29,7 @@ const getADoctorByIdAndSpecialization = async (req, res) => {
     const doctor = await doctorModel.getADoctorByIdAndSpecialization(specialization, doctor_id);
 
     if (doctor.length === 0) {
-      return res.status(404).json({ message: 'No doctor found' });
+      return res.status(404).json({ message: 'No doctor hey2 found' });
     }
 
     res.status(200).json(doctor);
@@ -117,7 +117,7 @@ const registerDoctor = async (req, res) => {
 
   } catch (error) {
     console.error("Error registering doctor:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.status(500).json({ message: "Server error doctController", error: error.message });
   }
 };
 
